@@ -1,0 +1,7 @@
+{
+    "name": "iot-client-sensor",
+    "version": "1.0.0",
+    "dependencies": [
+        "openssl"
+    ]
+}
