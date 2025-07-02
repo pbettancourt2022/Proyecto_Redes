@@ -3,6 +3,9 @@ import struct
 import hmac
 import hashlib
 from Crypto.Cipher import AES
+from datetime import datetime
+import requests
+import json
 
 # Configuración del servidor
 
@@ -21,11 +24,15 @@ HMAC_KEY = b"HMAC_SECRET_KEY"
 
 # Función: Desempaquetar los datos binarios descifrados
 def parsear_datos_sensor(data_bytes):
-    
+        
     # Esta función recibe los datos binarios sin cifrado y los convierte a valores legibles usando el formato:
     # ID: int16, timestamp: int64, temperatura: float, presión: float y humedad: float
 
     id, timestamp, temperatura, presion, humedad = struct.unpack("<H Q f f f", data_bytes)
+    
+    # Convertir timestamp UNIX a string ISO 8601
+    fecha_hora = datetime.utcfromtimestamp(timestamp).isoformat()
+
     print("=== Datos del Sensor ===")
     print(f"ID: {id}")
     print(f"Timestamp (UNIX): {timestamp}")
@@ -33,6 +40,14 @@ def parsear_datos_sensor(data_bytes):
     print(f"Presión: {presion:.2f} hPa")
     print(f"Humedad: {humedad:.2f} %")
     print("========================\n")
+
+    return {
+        "id": id,
+        "fecha_hora": fecha_hora,
+        "temperatura": temperatura,
+        "presion": presion,
+        "humedad": humedad
+    }
 
 # Aquí se inicia el servidor intermedio
 
@@ -97,7 +112,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as servidor:
                 datos_descifrados = aes.decrypt(ciphertext)
 
                 # Y por último se interpretan los datos
-                parsear_datos_sensor(datos_descifrados[:22])
+                datos_json = parsear_datos_sensor(datos_descifrados[:22])
+
+                try:
+                    respuesta = requests.post(
+                        "http://127.0.0.1:5000/datos",  # Dirección del Servidor Final
+                        json=datos_json,
+                        timeout=5
+                    )
+                    if respuesta.status_code == 201:
+                        print("[+] Datos enviados exitosamente al Servidor Final")
+                    else:
+                        print(f"[-] Error al enviar datos: {respuesta.status_code} {respuesta.text}")
+                except Exception as e:
+                    print(f"[!] No se pudo conectar con el Servidor Final: {e}")
 
             except Exception as e:
                 print(f"[!] Error inesperado: {e}")
