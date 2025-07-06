@@ -54,22 +54,25 @@ def recibir_datos():
         print(f"\033[1;31mError al guardar datos: {e}\033[0m")
         return jsonify({"error": str(e)}), 400
 
-
-# Ruta GET: consulta los últimos 3 datos
+# Ruta GET: consulta el último dato registrado
 @app.route('/datos', methods=['GET'])
-def obtener_datos():
+def obtener_dato_mas_reciente():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
-    c.execute('SELECT * FROM datos ORDER BY fecha_hora DESC LIMIT 3')
-    filas = c.fetchall()
-    conn.close()
-
-    resultado = [
-        {"id": f[0], "fecha_hora": f[1], "temperatura": f[2],
-         "presion": f[3], "humedad": f[4]}
-        for f in filas
-    ]
-    return jsonify(resultado)
+    c.execute('SELECT * FROM datos ORDER BY fecha_hora DESC LIMIT 1')
+    fila = c.fetchone()
+    resultado = []
+    if fila:
+        resultado.append({
+            "id": fila[0],
+            "fecha_hora": fila[1],
+            "temperatura": fila[2],
+            "presion": fila[3],
+            "humedad": fila[4]
+        })
+        return jsonify(resultado)
+    else:
+        return jsonify({"error": "No hay datos disponibles"}), 404
 
 # Ruta que renderiza el dashboard web con la visualización de datos de sensores.
 # Se accede a través de /dashboard en el navegador.
