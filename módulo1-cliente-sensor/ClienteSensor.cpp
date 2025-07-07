@@ -165,14 +165,14 @@ int main() {
         if (send(sock, (const char*)hmac, hmac_len, 0) <= 0) error = true;
 
         if (error) {
-            std::cerr << "[ERROR] Fallo en envío. Posible caída del servidor." << std::endl;
+            std::cerr << "[ERROR] Fallo en envio. Posible caida del servidor." << std::endl;
             closesocket(sock);        // Cerramos el socket actual
             WSACleanup();             // Finalizamos Winsock
             WSAStartup(MAKEWORD(2, 2), &wsaData); // Reiniciamos Winsock
 
             // Intentar reconectar cada 5 segundos
             while (!connect_to_server(sock, server_addr)) {
-                std::cerr << "[REINTENTO] Reintentando conexión en 5 segundos..." << std::endl;
+                std::cerr << "[REINTENTO] Reintentando conexion en 5 segundos..." << std::endl;
                 Sleep(5000);
             }
 
