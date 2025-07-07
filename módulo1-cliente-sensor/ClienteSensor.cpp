@@ -131,7 +131,7 @@ int main() {
 
     // Intentamos conectar al servidor inicialmente (bloquea hasta que lo logra)
     while (!connect_to_server(sock, server_addr)) {
-        std::cerr << "[REINTENTO] Reintentando conexión en 5 segundos..." << std::endl;
+        std::cerr << "[REINTENTO] Reintentando conexion en 5 segundos..." << std::endl;
         Sleep(5000); // Espera 5 segundos y vuelve a intentar
     }
 

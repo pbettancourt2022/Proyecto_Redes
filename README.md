@@ -45,3 +45,7 @@ python módulo4_cliente_consulta/cliente_consulta.py
 ```
 
 Asegúrate de que los servidores estén escuchando antes de iniciar el cliente sensor.
+
+# Biblioteca OpenSSL necesaria
+
+Para poder utilizar ClienteSensor.cpp es necesario instalar Win64 OpenSSL v3.5.0 EXE en la pagina siguiente https://slproweb.com/products/Win32OpenSSL.html
